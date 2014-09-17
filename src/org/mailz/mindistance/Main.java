@@ -21,13 +21,15 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
-        int n = 4;
-        Dot[] dots = new Dot[n];
-        dots[0] = new Dot(10, 20);
-        dots[1] = new Dot(-10, -10);
-        dots[2] = new Dot(20, 30);
-        dots[3] = new Dot(40, -10);
+        
+        
+        Dot[] dots;
+        dots = new Dot[args.length/2];
+        int n = 0;
+        for(int i = 0; i < args.length; i+=2){
+            dots[n] = new Dot(Integer.parseInt(args[i]), Integer.parseInt(args[i+1]));
+            n++;
+        }   
         double minimalDistance = Double.MAX_VALUE;
 
         // для слияния массивов
