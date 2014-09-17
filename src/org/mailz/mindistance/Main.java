@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.mailz.mindistance;
 
+import static java.lang.Math.abs;
 import static java.lang.Math.sqrt;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,76 +15,85 @@ import java.util.Comparator;
  *
  * @author ubick
  */
-
-
 public class Main {
 
     /**
      * @param args the command line arguments
      */
-     
-    
     public static void main(String[] args) {
         // TODO code application logic here
-       Dot [] dots = new Dot [3 ];
-       dots[0] = new Dot(100,200);
-       dots[1] = new Dot(20,8030);
-       dots[2] = new Dot(30,60);
-       //X
-       Arrays.sort(dots, new Comparator<Dot> () {
+        int n = 4;
+        Dot[] dots = new Dot[n];
+        dots[0] = new Dot(10, 20);
+        dots[1] = new Dot(-10, -10);
+        dots[2] = new Dot(20, 30);
+        dots[3] = new Dot(40, -10);
+        double minimalDistance = Double.MAX_VALUE;
+
+        // для слияния массивов
+        ArrayList<Dot> t = new ArrayList<>();
+
+        //сортировка по X
+        Arrays.sort(dots, new Comparator<Dot>() {
             @Override
             public int compare(Dot a, Dot b) {
-                int result =  a.getX()-(b.getX());
-                return ( result < 0.0 ) ? -1 : ( result > 0.0 ) ? 1 : 0;
+                int result = a.getX() - (b.getX());
+                return (result < 0.0) ? -1 : (result > 0.0) ? 1 : 0;
             }
         });
-       //Y
-        Arrays.sort(dots, new Comparator<Dot> () {
+
+        minimalDistance = rec(0, dots.length - 1, dots, t, minimalDistance);
+        System.out.println(minimalDistance);
+    }
+
+    static double rec(int l, int r, Dot[] arr, ArrayList<Dot> t, double minDistance) {
+        int i, j;
+        if (r - l < 4) {
+            for (i = l; i <= r; ++i) {
+                for (j = i + 1; j <= r; ++j) {
+                    minDistance = computeMinimalDistance(arr[i], arr[j], minDistance);
+                }
+            }
+            Arrays.sort(arr, new Comparator<Dot>() {
+                @Override
+                public int compare(Dot a, Dot b) {
+                    int result = a.getY() - (b.getY());
+                    return (result < 0.0) ? -1 : (result > 0.0) ? 1 : 0;
+                }
+            });
+            return minDistance;
+        }
+
+        int m = (l + r) / 2;
+        int midx = arr[m].getX();
+        rec(l, m, arr, t, minDistance);
+        rec(m + 1, r, arr, t, minDistance);
+        Arrays.sort(arr, new Comparator<Dot>() {
             @Override
             public int compare(Dot a, Dot b) {
-                int result =  a.getY()-(b.getY());
-                return ( result < 0.0 ) ? -1 : ( result > 0.0 ) ? 1 : 0;
+                int result = a.getY() - (b.getY());
+                return (result < 0.0) ? -1 : (result > 0.0) ? 1 : 0;
             }
         });
-        
-        double minimalDistance;
-        Dot ma, mb;
 
-        
-        
+        for (i = l; i <= r; ++i) {
+            if (abs(arr[i].getX() - midx) < minDistance) {
+                for (j = t.size() - 1; j >= 0 && arr[i].getY() - t.get(j).getY() < minDistance; --j) {
+                    minDistance = computeMinimalDistance(arr[i], t.get(j), minDistance);
+                }
+                t.add(arr[i]);
+            }
+        }
+        return minDistance;
     }
-    
-   void rec(int l, int r)
-{
-  int i, j;
-  if (r - l < 4) {
-    for (i = l; i <= r; ++i)
-      for (j = i + 1; j <= r; ++j)
-         computeDistance(dots[i], dots[j]);
-    Arrays.sort(dots[0] + l, dots[0] + r + 1, cmp_y);
-    return;
-  }
- 
-  int m = (l + r) / 2;
-  int midx = x[m].x;
-  rec(l, m);
-  rec(m + 1, r);
-  inplace_merge(x.begin() + l, x.begin() + m + 1, x.begin() + r + 1, cmp_y);
- 
-  vector<dot> t;
-  for (i = l; i <= r; ++i)
-    if (abs(x[i].x - midx) < mindist) {
-      for (j = t.size() - 1; j >= 0 && x[i].y - t[j].y < mindist; --j)
-        upd_ans (x[i], t[j]);
-      t.push_back(x[i]);
-    }
-}
- 
-    
-    
-   public double computeDistance(Dot a, Dot b){
-    return sqrt ((a.getX()-b.getX())*(a.getX()-b.getX()) + (a.getY()-b.getY())*(a.getY()-b.getY()));
-}
 
+    public static double computeMinimalDistance(Dot a, Dot b, double minDist) {
+        double distance = sqrt((a.getX() - b.getX()) * (a.getX() - b.getX()) + (a.getY() - b.getY()) * (a.getY() - b.getY()));
+        return distance < minDist ? distance : minDist;
+    }
+
+    public static double computeDistance(Dot a, Dot b) {
+        return sqrt((a.getX() - b.getX()) * (a.getX() - b.getX()) + (a.getY() - b.getY()) * (a.getY() - b.getY()));
+    }
 
 }
